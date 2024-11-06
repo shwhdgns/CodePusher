@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>GitHub 로그인 성공</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        p {
+            font-size: 18px;
+            color: #555;
+        }
+
+        .profile-info {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        .profile-info b {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>GitHub 로그인 성공</h1>
+    <p>안녕하세요, <b th:text="${name}"></b>님!</p>
+    <p>로그인된 GitHub 사용자 정보:</p>
+    <div class="profile-info">
+        <p><b>이메일:</b> <span th:text="${email}"></span></p>
+        <p><b>GitHub 사용자명:</b> <span th:text="${login}"></span></p>
+    </div>
+</div>
+
+</body>
+</html>

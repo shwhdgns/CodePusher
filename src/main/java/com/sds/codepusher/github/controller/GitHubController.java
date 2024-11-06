@@ -1,32 +1,28 @@
 package com.sds.codepusher.github.controller;
 
-import com.sds.codepusher.github.dto.GitHubResponseDTO;
 import com.sds.codepusher.github.service.GitHubService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.kohsuke.github.GitHub;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
-
-@RestController
+@Controller
 @RequiredArgsConstructor
 @RequestMapping("/github")
 public class GitHubController {
 
     private final GitHubService gitHubService;
 
-    @GetMapping("/test/{githubId}")
-    public ResponseEntity getGitHubRepository(@PathVariable("githubId") String gitHubId, HttpServletRequest request) {
-        GitHubResponseDTO response = gitHubService.read(gitHubId);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    @GetMapping("/github-login-success")
+    public ModelAndView githubLoginSuccess(@AuthenticationPrincipal OAuth2User principal, ModelAndView model) {
+        // 사용자 정보를 Thymeleaf 템플릿으로 전달
+        model.addObject("name", principal.getAttribute("name"));
+        model.addObject("email", principal.getAttribute("email"));
+        model.addObject("login", principal.getAttribute("login"));
+        model.setViewName("github-login-success");
+        return model;
     }
-
-    @PostMapping("/connect")
-    public GitHub connectGitHub(HttpServletRequest request) throws IOException {
-        return gitHubService.connectGitHub("");
-    }
-
 }
