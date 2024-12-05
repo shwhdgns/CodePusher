@@ -1,6 +1,8 @@
 package com.sds.codepusher.config;
 
+import com.sds.codepusher.login.filter.JwtAuthenticationFilter;
 import com.sds.codepusher.login.jwt.service.JwtService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -8,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -20,9 +23,23 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                // 요청 권한 설정
+    @ConditionalOnProperty(name = "auth.form-login", havingValue = "true", matchIfMissing = false)
+    public SecurityFilterChain formLoginSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .permitAll()
+                )
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().authenticated()
+                );
+        return http.build();
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "auth.oauth2-login", havingValue = "true", matchIfMissing = false)
+    public SecurityFilterChain oauth2LoginSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/login", "/error").permitAll()
                         .anyRequest().authenticated()
@@ -34,8 +51,19 @@ public class SecurityConfig {
                         // 로그인 실패 URL
                         .failureUrl("/error")
                 );
+        return http.build();
+    }
 
-        return httpSecurity.build();
+    @Bean
+    @ConditionalOnProperty(name = "auth.jwt-login", havingValue = "true", matchIfMissing = false)
+    public SecurityFilterChain jwtLoginSecurityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter) throws Exception {
+        http
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().authenticated()
+                );
+
+        return http.build();
     }
 
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
